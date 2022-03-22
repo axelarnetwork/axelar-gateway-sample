@@ -53,9 +53,19 @@ import { ethers } from "ethers";
     symbol: "WETH",
   });
 
-  const sendTokenreceipt = await unsignedSendTokenTx.send(signer);
+  const sendTokenReceipt = await unsignedSendTokenTx.send(signer);
 
-  console.log("Send token transaction hash:", sendTokenreceipt.hash);
+  console.log("Send token transaction hash:", sendTokenReceipt.hash);
 
   // -----------------------------------------------------------------
+
+  // Send call contract transaction
+  const unsignedCallContractTx = await gateway.createCallContractTx({
+    contractAddress: "", // An address of AxelarExecutable contract on the destination chain
+    destinationChain: EvmChain.FANTOM,
+    payload: "0x...",
+  });
+
+  const callContractTxReceipt = await unsignedCallContractTx.send(signer);
+  console.log("Call contract tx receipt:", callContractTxReceipt.hash);
 })();
