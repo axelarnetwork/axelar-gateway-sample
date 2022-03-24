@@ -29,7 +29,7 @@ export function createIBCTransferMsg(
   symbol: string,
   amount: string
 ) {
-  const coin = new Coin(symbol, ethers.utils.parseUnits(amount, 6).toString());
+  const coin = new Coin(symbol, amount);
   return new MsgTransfer(
     "transfer",
     TERRA_TO_AXELAR_CHANNEL,
