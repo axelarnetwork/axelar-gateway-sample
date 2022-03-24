@@ -4,12 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node src/index.ts"
+    "start": "ts-node src/index.ts",
+    "send-terra": "ts-node src/send-token-terra-to-evm.ts"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@axelar-network/axelarjs-sdk": "file:../axelarjs-sdk",
+    "@axelar-network/axelarjs-sdk": "^0.5.0-alpha.4",
+    "@terra-money/terra.js": "^3.0.8",
     "ethers": "^5.6.1"
   },
   "devDependencies": {
