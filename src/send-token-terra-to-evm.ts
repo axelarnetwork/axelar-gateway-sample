@@ -20,9 +20,9 @@ const transferAmount = ethers.utils.parseUnits("10", 6); // 10 UST
 async function getDepositAddress(destinationAddress: string, env = "testnet") {
   const client = new TransferAssetBridge(env);
   const payload: GetDepositAddressPayload = {
-    fromChain: "axelar",
+    fromChain: "terra",
     toChain: "avalanche",
-    asset: "uusd",
+    asset: transferToken,
     destinationAddress,
   };
   return client.getDepositAddress({ payload });
