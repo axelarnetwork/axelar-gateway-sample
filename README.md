@@ -1,4 +1,4 @@
-# [WIP] Axelar Gateway Demo
+# [WIP] Axelar Gateway Sample
 
 This repo demonstrates the usage of `AxelarGateway` in the `@axelar-network/axelarjs-sdk`
 
