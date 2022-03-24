@@ -61,7 +61,7 @@ import { ethers } from "ethers";
 
   // Send call contract transaction
   const unsignedCallContractTx = await gateway.createCallContractTx({
-    contractAddress: "", // An address of AxelarExecutable contract on the destination chain
+    destinationContractAddress: "", // An address of AxelarExecutable contract on the destination chain
     destinationChain: EvmChain.FANTOM,
     payload: "0x...",
   });
