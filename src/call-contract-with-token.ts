@@ -8,6 +8,7 @@ import { ethers } from "ethers";
 import erc20Abi from "./abi/erc20.json";
 
 const UST_ADDRESS_AVALANCHE = "0x96640d770bf4a15Fb8ff7ae193F3616425B15FFE";
+const AXELAR_GATEWAY_CONTRACT = "0x4ffb57aea2295d663b03810a5802ef2bc322370d";
 const privateKey = process.env.PRIVATE_KEY;
 const provider = new ethers.providers.JsonRpcProvider(
   "https://api.avax-test.network/ext/bc/C/rpc"
@@ -24,7 +25,7 @@ async function isRequireApprove(address: string) {
   const contract = new ethers.Contract(address, erc20Abi, provider);
   const allowance: ethers.BigNumber = await contract.allowance(
     evmWallet.address,
-    "0x4ffb57aea2295d663b03810a5802ef2bc322370d"
+    AXELAR_GATEWAY_CONTRACT
   );
   return allowance.isZero();
 }
