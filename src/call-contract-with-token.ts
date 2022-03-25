@@ -54,12 +54,15 @@ async function isRequireApprove(address: string) {
   }
 
   console.log("\n==== Call contract with token ====");
+  const encoder = ethers.utils.defaultAbiCoder;
+  const payload = encoder.encode(["address[]"], [[evmWallet.address]]);
+  console.log(payload);
   const callContractReceipt = await gateway
     .createCallContractWithTokenTx({
       destinationChain: EvmChain.ETHEREUM,
+      destinationContractAddress: "0xB628ff5b78bC8473a11299d78f2089380f4B1939",
+      payload,
       amount,
-      destinationContractAddress: "0x9d71b2bA8a9359f24A0e0d43C29d654e47a98Ca6",
-      payload: ethers.utils.hexZeroPad(evmWallet.address, 32),
       symbol: "UST",
     })
     .then((tx) => tx.send(evmWallet))
@@ -67,6 +70,6 @@ async function isRequireApprove(address: string) {
 
   console.log(
     "Call contract with token tx:",
-    callContractReceipt.transactionHash
+    `https://testnet.snowtrace.io/tx/${callContractReceipt.transactionHash}`
   );
 })();
