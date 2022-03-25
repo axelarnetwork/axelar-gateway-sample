@@ -2,9 +2,7 @@
 
 This repo demonstrates the usage of `AxelarGateway` in the `@axelar-network/axelarjs-sdk`
 
-## Features
+## Use cases
 
-- Approve ERC20 token
-- Send token to the gateway contract
+- Send token from terra the axelar deposit address with ibc transfer.
 - Call contract on another chain
-- Call contract on another chain with erc20 token
