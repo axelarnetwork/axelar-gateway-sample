@@ -4,7 +4,7 @@ pragma solidity 0.8.9;
 import {IAxelarExecutable} from "./IAxelarExecutable.sol";
 import {IERC20} from "./IERC20.sol";
 
-contract DistributionExecutable is IAxelarExecutable {
+contract DistributionExecutor is IAxelarExecutable {
     constructor(address gatewayAddress) IAxelarExecutable(gatewayAddress) {}
 
     function _executeWithToken(
