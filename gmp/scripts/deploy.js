@@ -11,7 +11,7 @@ async function deploy(gatewayAddress) {
 
   await executor.deployed();
 
-  console.log("Executor deployed to:", greeter.address);
+  console.log("Executor deployed to:", executor.address);
 }
 
 const gatewayAddress = "0x7358799e0c8250f0B7D1164824F6Dd5bA31C9Cd6"; //ethereum
