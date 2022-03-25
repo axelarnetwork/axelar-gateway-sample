@@ -17,7 +17,7 @@ const recipientAddress = "0xa411977dd24F1547065C6630E468a43275cB4d7f";
 const transferToken = "uusd"; // can be either uusd or uluna
 const transferAmount = ethers.utils.parseUnits("10", 6); // 10 UST
 
-async function getDepositAddress(destinationAddress: string, env = "testnet") {
+async function getDepositAddress(destinationAddress: string, env = "devnet") {
   const client = new TransferAssetBridge(env);
   const payload: GetDepositAddressPayload = {
     fromChain: "terra",
