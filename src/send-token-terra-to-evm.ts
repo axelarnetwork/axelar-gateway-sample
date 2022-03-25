@@ -51,7 +51,7 @@ async function getDepositAddress(destinationAddress: string, env = "testnet") {
   const transferCoin = coins.get(transferToken);
   const ibcMsg = createIBCTransferMsg(
     wallet.key.accAddress,
-    recipientAddress,
+    depositAddress,
     transferCoin.denom,
     transferAmount.toString()
   );
