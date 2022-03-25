@@ -20,6 +20,15 @@ function getBalance(address: string) {
   return contract.balanceOf(evmWallet.address);
 }
 
+async function isRequireApprove(address: string) {
+  const contract = new ethers.Contract(address, erc20Abi, provider);
+  const allowance: ethers.BigNumber = await contract.allowance(
+    evmWallet.address,
+    "0x4ffb57aea2295d663b03810a5802ef2bc322370d"
+  );
+  return allowance.isZero();
+}
+
 (async () => {
   const gateway = AxelarGateway.create(
     Environment.DEVNET,
@@ -31,15 +40,18 @@ function getBalance(address: string) {
   console.log(ethers.utils.formatUnits(ustBalance, 6), "UST");
 
   // Approve UST to Gateway Contract
-  console.log("\n==== Approving UST... ====");
-  const receipt = await gateway
-    .createApproveTx({ tokenAddress: UST_ADDRESS_AVALANCHE })
-    .then((tx) => tx.send(evmWallet))
-    .then((tx) => tx.wait());
-  console.log(
-    "UST has been approved to gateway contract",
-    receipt.transactionHash
-  );
+  const requiredApprove = await isRequireApprove(UST_ADDRESS_AVALANCHE);
+  if (requiredApprove) {
+    console.log("\n==== Approving UST... ====");
+    const receipt = await gateway
+      .createApproveTx({ tokenAddress: UST_ADDRESS_AVALANCHE })
+      .then((tx) => tx.send(evmWallet))
+      .then((tx) => tx.wait());
+    console.log(
+      "UST has been approved to gateway contract",
+      receipt.transactionHash
+    );
+  }
 
   console.log("\n==== Call contract with token ====");
   const callContractReceipt = await gateway
@@ -52,6 +64,7 @@ function getBalance(address: string) {
     })
     .then((tx) => tx.send(evmWallet))
     .then((tx) => tx.wait());
+
   console.log(
     "Call contract with token tx:",
     callContractReceipt.transactionHash
