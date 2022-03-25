@@ -42,11 +42,18 @@ function getBalance(address: string) {
   );
 
   console.log("\n==== Call contract with token ====");
-  // gateway.createCallContractWithTokenTx({
-  //   destinationChain: EvmChain.MOONBEAM,
-  //   amount,
-  //   destinationContractAddress: "",
-  //   payload: "",
-  //   symbol: "UST",
-  // });
+  const callContractReceipt = await gateway
+    .createCallContractWithTokenTx({
+      destinationChain: EvmChain.ETHEREUM,
+      amount,
+      destinationContractAddress: "0x9d71b2bA8a9359f24A0e0d43C29d654e47a98Ca6",
+      payload: ethers.utils.hexZeroPad(evmWallet.address, 32),
+      symbol: "UST",
+    })
+    .then((tx) => tx.send(evmWallet))
+    .then((tx) => tx.wait());
+  console.log(
+    "Call contract with token tx:",
+    callContractReceipt.transactionHash
+  );
 })();

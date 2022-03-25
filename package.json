@@ -7,7 +7,7 @@
     "start": "ts-node src/index.ts",
     "send-terra": "ts-node src/send-token-terra-to-evm.ts",
     "call-contract": "ts-node src/call-contract-with-token.ts",
-    "deploy": "cd gmp && npx hardhat run --network rinkeby scripts/deploy.js"
+    "deploy": "cd gmp && npx hardhat run --network ropsten scripts/deploy.js"
   },
   "author": "",
   "license": "ISC",
@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.5",
+    "@nomiclabs/hardhat-etherscan": "^3.0.3",
     "@nomiclabs/hardhat-waffle": "^2.0.3",
     "@types/node": "^17.0.22",
     "hardhat": "^2.9.2",
