@@ -7,7 +7,6 @@ import {
 import { ethers } from "ethers";
 import erc20Abi from "./abi/erc20.json";
 
-const UST_ADDRESS_AVALANCHE = "0x96640d770bf4a15Fb8ff7ae193F3616425B15FFE";
 const AXELAR_GATEWAY_CONTRACT = "0x4ffb57aea2295d663b03810a5802ef2bc322370d";
 const privateKey = process.env.PRIVATE_KEY;
 const provider = new ethers.providers.JsonRpcProvider(
@@ -16,6 +15,7 @@ const provider = new ethers.providers.JsonRpcProvider(
 const amount = ethers.utils.parseUnits("10", 6).toString();
 const evmWallet = new ethers.Wallet(privateKey, provider);
 const tokenSymbol = "UST";
+const tokenAddress = "0x96640d770bf4a15Fb8ff7ae193F3616425B15FFE";
 
 function getBalance(address: string) {
   const contract = new ethers.Contract(address, erc20Abi, provider);
@@ -38,15 +38,15 @@ async function isRequireApprove(address: string) {
     provider
   );
   console.log("==== Your UST balance ==== ");
-  const ustBalance = await getBalance(UST_ADDRESS_AVALANCHE);
-  console.log(ethers.utils.formatUnits(ustBalance, 6), "UST");
+  const tokenBalance = await getBalance(tokenAddress);
+  console.log(ethers.utils.formatUnits(tokenBalance, 6), tokenSymbol);
 
   // Approve UST to Gateway Contract
-  const requiredApprove = await isRequireApprove(UST_ADDRESS_AVALANCHE);
+  const requiredApprove = await isRequireApprove(tokenAddress);
   if (requiredApprove) {
     console.log("\n==== Approving UST... ====");
     const receipt = await gateway
-      .createApproveTx({ tokenAddress: UST_ADDRESS_AVALANCHE })
+      .createApproveTx({ tokenAddress: tokenAddress })
       .then((tx) => tx.send(evmWallet))
       .then((tx) => tx.wait());
     console.log(
