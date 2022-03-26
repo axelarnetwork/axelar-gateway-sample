@@ -8,6 +8,8 @@ import { ethers } from "ethers";
 import erc20Abi from "./abi/erc20.json";
 
 const AXELAR_GATEWAY_CONTRACT = "0x4ffb57aea2295d663b03810a5802ef2bc322370d";
+const DISTRIBUTION_EXECUTOR_ADDRESS =
+  "0xB628ff5b78bC8473a11299d78f2089380f4B1939";
 const privateKey = process.env.PRIVATE_KEY;
 const provider = new ethers.providers.JsonRpcProvider(
   "https://api.avax-test.network/ext/bc/C/rpc"
@@ -62,7 +64,7 @@ async function isRequireApprove(address: string) {
   const callContractReceipt = await gateway
     .createCallContractWithTokenTx({
       destinationChain: EvmChain.ETHEREUM,
-      destinationContractAddress: "0xB628ff5b78bC8473a11299d78f2089380f4B1939",
+      destinationContractAddress: DISTRIBUTION_EXECUTOR_ADDRESS,
       payload,
       amount,
       symbol: tokenSymbol,
