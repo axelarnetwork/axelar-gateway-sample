@@ -15,6 +15,7 @@ const provider = new ethers.providers.JsonRpcProvider(
 );
 const amount = ethers.utils.parseUnits("10", 6).toString();
 const evmWallet = new ethers.Wallet(privateKey, provider);
+const tokenSymbol = "UST";
 
 function getBalance(address: string) {
   const contract = new ethers.Contract(address, erc20Abi, provider);
@@ -64,7 +65,7 @@ async function isRequireApprove(address: string) {
       destinationContractAddress: "0xB628ff5b78bC8473a11299d78f2089380f4B1939",
       payload,
       amount,
-      symbol: "UST",
+      symbol: tokenSymbol,
     })
     .then((tx) => tx.send(evmWallet))
     .then((tx) => tx.wait());
