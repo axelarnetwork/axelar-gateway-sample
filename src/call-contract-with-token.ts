@@ -39,20 +39,20 @@ async function isRequireApprove(address: string) {
     EvmChain.AVALANCHE,
     provider
   );
-  console.log("==== Your UST balance ==== ");
+  console.log(`==== Your ${tokenSymbol} balance ==== `);
   const tokenBalance = await getBalance(tokenAddress);
   console.log(ethers.utils.formatUnits(tokenBalance, 6), tokenSymbol);
 
-  // Approve UST to Gateway Contract
+  // Approve token to Gateway Contract
   const requiredApprove = await isRequireApprove(tokenAddress);
   if (requiredApprove) {
-    console.log("\n==== Approving UST... ====");
+    console.log(`\n==== Approving ${tokenSymbol}... ====`);
     const receipt = await gateway
       .createApproveTx({ tokenAddress: tokenAddress })
       .then((tx) => tx.send(evmWallet))
       .then((tx) => tx.wait());
     console.log(
-      "UST has been approved to gateway contract",
+      `${tokenSymbol} has been approved to gateway contract`,
       receipt.transactionHash
     );
   }
