@@ -33,6 +33,10 @@ async function isRequireApprove(address: string) {
   return allowance.isZero();
 }
 
+const recipientWallets = new Array(20)
+  .fill(0)
+  .map(() => ethers.Wallet.createRandom().address);
+
 (async () => {
   const gateway = AxelarGateway.create(
     Environment.DEVNET,
@@ -59,7 +63,7 @@ async function isRequireApprove(address: string) {
 
   console.log("\n==== Call contract with token ====");
   const encoder = ethers.utils.defaultAbiCoder;
-  const payload = encoder.encode(["address[]"], [[evmWallet.address]]);
+  const payload = encoder.encode(["address[]"], [recipientWallets]);
   console.log(payload);
   const callContractReceipt = await gateway
     .createCallContractWithTokenTx({
