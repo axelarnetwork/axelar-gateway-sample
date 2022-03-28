@@ -56,5 +56,8 @@ async function getDepositAddress(destinationAddress: string, env = "devnet") {
     transferAmount.toString()
   );
   const receipt = await signAndBroadcast(wallet, ibcMsg);
-  console.log("IBC Tx:", receipt.txhash);
+  console.log(
+    "IBC Tx:",
+    "https://finder.terra.money/testnet/tx/" + receipt.txhash
+  );
 })();
