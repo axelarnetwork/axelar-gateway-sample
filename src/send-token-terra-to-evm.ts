@@ -6,14 +6,13 @@ import {
 import { ethers } from "ethers";
 import {
   createIBCTransferMsg,
-  importTerraWallet,
   printTerraBalance,
   signAndBroadcast,
-} from "./utils/terraHelper";
+} from "./utils/terra";
+import { evmWallet, terraWallet } from "./wallet";
 
 // Config your own here.
-const terraMnemonic = process.env.TERRA_MNEMONIC;
-const recipientAddress = "0xa411977dd24F1547065C6630E468a43275cB4d7f";
+const recipientAddress = evmWallet.address;
 const transferToken = "uusd"; // can be either uusd or uluna
 const transferAmount = ethers.utils.parseUnits("10", 6); // 10 UST
 
@@ -30,13 +29,12 @@ async function getDepositAddress(destinationAddress: string, env = "devnet") {
 
 (async () => {
   // Import existing terra wallet
-  const wallet = importTerraWallet(terraMnemonic);
   console.log("==== Your terra wallet info ==== ");
-  console.log("Address:", wallet.key.accAddress);
+  console.log("Address:", terraWallet.key.accAddress);
 
   // Print terra balances
-  const coins = await wallet.lcd.bank
-    .balance(wallet.key.accAddress)
+  const coins = await terraWallet.lcd.bank
+    .balance(terraWallet.key.accAddress)
     .then(([coins]) =>
       coins.filter((coin) => ["uusd", "uluna"].includes(coin.denom))
     );
@@ -50,12 +48,12 @@ async function getDepositAddress(destinationAddress: string, env = "devnet") {
   // IBC transfer UST token
   const transferCoin = coins.get(transferToken);
   const ibcMsg = createIBCTransferMsg(
-    wallet.key.accAddress,
+    terraWallet.key.accAddress,
     depositAddress,
     transferCoin.denom,
     transferAmount.toString()
   );
-  const receipt = await signAndBroadcast(wallet, ibcMsg);
+  const receipt = await signAndBroadcast(terraWallet, ibcMsg);
   console.log(
     "IBC Tx:",
     "https://finder.terra.money/testnet/tx/" + receipt.txhash
