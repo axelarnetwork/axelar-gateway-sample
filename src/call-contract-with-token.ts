@@ -9,7 +9,6 @@ import erc20Abi from "./abi/erc20.json";
 import { evmWallet } from "./wallet";
 
 // Config your own here.
-const AXELAR_GATEWAY_CONTRACT = "0x4ffb57aea2295d663b03810a5802ef2bc322370d";
 const DISTRIBUTION_EXECUTOR_ADDRESS =
   "0xB628ff5b78bC8473a11299d78f2089380f4B1939";
 const provider = new ethers.providers.JsonRpcProvider(
@@ -18,6 +17,11 @@ const provider = new ethers.providers.JsonRpcProvider(
 const amount = ethers.utils.parseUnits("10", 6).toString();
 const tokenSymbol = "UST";
 const tokenAddress = "0x96640d770bf4a15Fb8ff7ae193F3616425B15FFE";
+const gateway = AxelarGateway.create(
+  Environment.DEVNET,
+  EvmChain.AVALANCHE,
+  provider
+);
 
 function getBalance(address: string) {
   const contract = new ethers.Contract(address, erc20Abi, provider);
@@ -28,7 +32,7 @@ async function isRequireApprove(address: string) {
   const contract = new ethers.Contract(address, erc20Abi, provider);
   const allowance: ethers.BigNumber = await contract.allowance(
     evmWallet.address,
-    AXELAR_GATEWAY_CONTRACT
+    gateway.getContract().address
   );
   return allowance.isZero();
 }
@@ -38,11 +42,6 @@ const recipientWallets = new Array(20)
   .map(() => ethers.Wallet.createRandom().address);
 
 (async () => {
-  const gateway = AxelarGateway.create(
-    Environment.DEVNET,
-    EvmChain.AVALANCHE,
-    provider
-  );
   console.log(`==== Your ${tokenSymbol} balance ==== `);
   const tokenBalance = await getBalance(tokenAddress);
   console.log(ethers.utils.formatUnits(tokenBalance, 6), tokenSymbol);
