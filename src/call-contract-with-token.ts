@@ -9,12 +9,11 @@ import erc20Abi from "./abi/erc20.json";
 import { evmWallet } from "./wallet";
 
 // Config your own here.
-const DISTRIBUTION_EXECUTOR_ADDRESS =
-  "0xB628ff5b78bC8473a11299d78f2089380f4B1939";
 const provider = new ethers.providers.JsonRpcProvider(
   "https://api.avax-test.network/ext/bc/C/rpc"
 );
 const amount = ethers.utils.parseUnits("10", 6).toString();
+const executorContractAddress = "0xB628ff5b78bC8473a11299d78f2089380f4B1939";
 const tokenSymbol = "UST";
 const tokenAddress = "0x96640d770bf4a15Fb8ff7ae193F3616425B15FFE";
 const gateway = AxelarGateway.create(
@@ -67,7 +66,7 @@ const recipientWallets = new Array(20)
   const callContractReceipt = await gateway
     .createCallContractWithTokenTx({
       destinationChain: EvmChain.ETHEREUM,
-      destinationContractAddress: DISTRIBUTION_EXECUTOR_ADDRESS,
+      destinationContractAddress: executorContractAddress,
       payload,
       amount,
       symbol: tokenSymbol,
