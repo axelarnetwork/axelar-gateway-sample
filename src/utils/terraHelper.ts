@@ -16,7 +16,7 @@ const MAP_DENOM_TO_SYMBOL = {
   uluna: "Luna",
 };
 
-const TERRA_TO_AXELAR_CHANNEL = "channel-78";
+const TERRA_TO_AXELAR_CHANNEL = "channel-105";
 const TERRA_LCD = "https://bombay-lcd.terra.dev";
 const lcdClient = new LCDClient({
   URL: TERRA_LCD,
