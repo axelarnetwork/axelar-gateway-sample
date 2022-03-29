@@ -7,15 +7,14 @@ import {
 import { ethers } from "ethers";
 import erc20Abi from "./abi/erc20.json";
 import { evmWallet } from "./wallet";
+import { DISTRIBUTION_EXECUTOR, TOKEN } from "./constants/address";
 
 // Config your own here.
 const provider = new ethers.providers.JsonRpcProvider(
   "https://api.avax-test.network/ext/bc/C/rpc"
 );
 const amount = ethers.utils.parseUnits("10", 6).toString();
-const executorContractAddress = "0xB628ff5b78bC8473a11299d78f2089380f4B1939";
 const tokenSymbol = "UST";
-const tokenAddress = "0x96640d770bf4a15Fb8ff7ae193F3616425B15FFE";
 const gateway = AxelarGateway.create(
   Environment.DEVNET,
   EvmChain.AVALANCHE,
@@ -42,15 +41,15 @@ const recipientWallets = new Array(20)
 
 (async () => {
   console.log(`==== Your ${tokenSymbol} balance ==== `);
-  const tokenBalance = await getBalance(tokenAddress);
+  const tokenBalance = await getBalance(TOKEN[tokenSymbol]);
   console.log(ethers.utils.formatUnits(tokenBalance, 6), tokenSymbol);
 
   // Approve token to Gateway Contract
-  const requiredApprove = await isRequireApprove(tokenAddress);
+  const requiredApprove = await isRequireApprove(TOKEN.UST);
   if (requiredApprove) {
     console.log(`\n==== Approving ${tokenSymbol}... ====`);
     const receipt = await gateway
-      .createApproveTx({ tokenAddress: tokenAddress })
+      .createApproveTx({ tokenAddress: TOKEN[tokenSymbol] })
       .then((tx) => tx.send(evmWallet))
       .then((tx) => tx.wait());
     console.log(
@@ -62,11 +61,10 @@ const recipientWallets = new Array(20)
   console.log("\n==== Call contract with token ====");
   const encoder = ethers.utils.defaultAbiCoder;
   const payload = encoder.encode(["address[]"], [recipientWallets]);
-  console.log(payload);
   const callContractReceipt = await gateway
     .createCallContractWithTokenTx({
       destinationChain: EvmChain.ETHEREUM,
-      destinationContractAddress: executorContractAddress,
+      destinationContractAddress: DISTRIBUTION_EXECUTOR[EvmChain.ETHEREUM],
       payload,
       amount,
       symbol: tokenSymbol,
