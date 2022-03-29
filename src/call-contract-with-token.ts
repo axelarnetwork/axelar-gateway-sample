@@ -8,10 +8,11 @@ import { ethers } from "ethers";
 import erc20Abi from "./abi/erc20.json";
 import { evmWallet } from "./wallet";
 import { DISTRIBUTION_EXECUTOR, TOKEN } from "./constants/address";
+import { RPC_ENDPOINT } from "./constants/endpoint";
 
 // Config your own here.
 const provider = new ethers.providers.JsonRpcProvider(
-  "https://api.avax-test.network/ext/bc/C/rpc"
+  RPC_ENDPOINT[EvmChain.AVALANCHE]
 );
 const amount = ethers.utils.parseUnits("10", 6).toString();
 const tokenSymbol = "UST";

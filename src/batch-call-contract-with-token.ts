@@ -9,11 +9,13 @@ import {
   DISTRIBUTION_EXECUTOR,
   TOKEN,
 } from "./constants/address";
+import { RPC_ENDPOINT } from "./constants/endpoint";
 
 // Config your own here.
 const provider = new ethers.providers.JsonRpcProvider(
-  "https://api.avax-test.network/ext/bc/C/rpc"
+  RPC_ENDPOINT[EvmChain.AVALANCHE]
 );
+
 const ustAmount = ethers.utils.parseUnits("10", 6).toString();
 const lunaAmount = ethers.utils.parseUnits("1", 5).toString();
 const ust = "UST";
