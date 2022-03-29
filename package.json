@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node src/index.ts",
     "send-terra": "ts-node src/send-token-terra-to-evm.ts",
     "call-contract": "ts-node src/call-contract-with-token.ts",
     "batch-call-contract": "ts-node src/batch-call-contract-with-token.ts",
