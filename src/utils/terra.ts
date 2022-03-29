@@ -11,8 +11,8 @@ import { Height } from "@terra-money/terra.js/dist/core/ibc/msgs/client/Height";
 import { ethers } from "ethers";
 
 const MAP_DENOM_TO_SYMBOL = {
-  uusd: "Ust",
-  uluna: "Luna",
+  uusd: "UST",
+  uluna: "LUNA",
 };
 
 export const TERRA_TO_AXELAR_CHANNEL = "channel-105";
