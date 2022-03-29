@@ -36,10 +36,6 @@ async function isRequireApprove(address: string) {
   return allowance.isZero();
 }
 
-const recipientWallets = new Array(20)
-  .fill(0)
-  .map(() => ethers.Wallet.createRandom().address);
-
 (async () => {
   console.log(`==== Your ${tokenSymbol} balance ==== `);
   const tokenBalance = await getBalance(TOKEN[tokenSymbol]);
@@ -61,7 +57,7 @@ const recipientWallets = new Array(20)
 
   console.log("\n==== Call contract with token ====");
   const encoder = ethers.utils.defaultAbiCoder;
-  const payload = encoder.encode(["address[]"], [recipientWallets]);
+  const payload = encoder.encode(["address[]"], [evmWallet.address]);
   const callContractReceipt = await gateway
     .createCallContractWithTokenTx({
       destinationChain: EvmChain.ETHEREUM,
@@ -70,7 +66,7 @@ const recipientWallets = new Array(20)
       amount,
       symbol: tokenSymbol,
     })
-    .then((tx) => tx.send(evmWallet))
+    .then((tx) => tx.send(evmWallet.connect(provider)))
     .then((tx) => tx.wait());
 
   console.log(
