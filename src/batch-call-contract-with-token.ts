@@ -1,9 +1,5 @@
 import "dotenv/config";
-import {
-  AxelarGateway,
-  Environment,
-  EvmChain,
-} from "@axelar-network/axelarjs-sdk";
+import { EvmChain } from "@axelar-network/axelarjs-sdk";
 import { ethers } from "ethers";
 import erc20Abi from "./abi/erc20.json";
 import batchMessageSenderAbi from "./abi/batchMessageSender.json";
@@ -117,7 +113,6 @@ async function approveAll(tokens: { address: string; name: string }[]) {
     ])
     .then((tx) => tx.wait());
 
-  // const callContractReceipt =
   console.log(
     "Call contract with token tx:",
     `https://testnet.snowtrace.io/tx/${receipt.transactionHash}`
