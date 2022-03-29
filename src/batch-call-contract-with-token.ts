@@ -4,6 +4,11 @@ import { ethers } from "ethers";
 import erc20Abi from "./abi/erc20.json";
 import batchMessageSenderAbi from "./abi/batchMessageSender.json";
 import { evmWallet } from "./wallet";
+import {
+  BATCH_MESSAGE_SENDER,
+  DISTRIBUTION_EXECUTOR,
+  TOKEN,
+} from "./constants/address";
 
 // Config your own here.
 const provider = new ethers.providers.JsonRpcProvider(
@@ -11,16 +16,8 @@ const provider = new ethers.providers.JsonRpcProvider(
 );
 const ustAmount = ethers.utils.parseUnits("10", 6).toString();
 const lunaAmount = ethers.utils.parseUnits("1", 5).toString();
-const batchMessageSenderContractAddress =
-  "0x06b0740e9bB86f7ACA9ec8f5a81f4c13900d9C0b";
-const moonbeamExecutorContractAddress =
-  "0x9d71b2bA8a9359f24A0e0d43C29d654e47a98Ca6";
-const ethereumExecutorContractAddress =
-  "0xB628ff5b78bC8473a11299d78f2089380f4B1939";
 const ust = "UST";
 const luna = "LUNA";
-const ustAddress = "0x96640d770bf4a15Fb8ff7ae193F3616425B15FFE";
-const lunaAddress = "0xf640B78954f09673A01e9AEFd11c353DDE3c8D6B";
 
 function getBalance(address: string) {
   const contract = new ethers.Contract(address, erc20Abi, provider);
@@ -31,7 +28,7 @@ async function isRequireApprove(address: string) {
   const contract = new ethers.Contract(address, erc20Abi, provider);
   const allowance: ethers.BigNumber = await contract.allowance(
     evmWallet.address,
-    batchMessageSenderContractAddress
+    BATCH_MESSAGE_SENDER[EvmChain.AVALANCHE]
   );
   return allowance.isZero();
 }
@@ -43,7 +40,7 @@ async function approve(tokenAddress: string) {
     evmWallet.connect(provider)
   );
   return contract.approve(
-    batchMessageSenderContractAddress,
+    BATCH_MESSAGE_SENDER[EvmChain.AVALANCHE],
     ethers.constants.MaxUint256
   );
 }
@@ -64,15 +61,15 @@ async function approveAll(tokens: { address: string; name: string }[]) {
 
 (async () => {
   console.log(`==== Your balance ==== `);
-  const ustBalance = await getBalance(ustAddress);
+  const ustBalance = await getBalance(TOKEN.UST);
   console.log(ethers.utils.formatUnits(ustBalance, 6), ust);
-  const lunaBalance = await getBalance(lunaAddress);
+  const lunaBalance = await getBalance(TOKEN.LUNA);
   console.log(ethers.utils.formatUnits(lunaBalance, 6), luna);
 
   // Approve tokens to Gateway Contract
   await approveAll([
-    { address: ustAddress, name: ust },
-    { address: lunaAddress, name: luna },
+    { address: TOKEN.UST, name: ust },
+    { address: TOKEN.LUNA, name: luna },
   ]);
 
   console.log("\n==== Call contract with token ====");
@@ -85,7 +82,7 @@ async function approveAll(tokens: { address: string; name: string }[]) {
     ["string", "string", "bytes", "string", "uint256"],
     [
       EvmChain.ETHEREUM,
-      ethereumExecutorContractAddress,
+      DISTRIBUTION_EXECUTOR[EvmChain.ETHEREUM],
       payloadDistributionExecutor,
       ust,
       ustAmount,
@@ -95,14 +92,14 @@ async function approveAll(tokens: { address: string; name: string }[]) {
     ["string", "string", "bytes", "string", "uint256"],
     [
       EvmChain.MOONBEAM,
-      moonbeamExecutorContractAddress,
+      DISTRIBUTION_EXECUTOR[EvmChain.MOONBEAM],
       payloadDistributionExecutor,
       luna,
       lunaAmount,
     ]
   );
   const contract = new ethers.Contract(
-    batchMessageSenderContractAddress,
+    BATCH_MESSAGE_SENDER[EvmChain.AVALANCHE],
     batchMessageSenderAbi,
     evmWallet.connect(provider)
   );
