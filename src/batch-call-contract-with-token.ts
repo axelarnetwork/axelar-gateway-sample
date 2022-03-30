@@ -1,3 +1,6 @@
+// Initial state: 10 UST and 0.1 LUNA on Avalanche
+// Goal: 10 UST on Ethereum and 0.1 LUNA on Moonbeam in a single transaction.
+
 import "dotenv/config";
 import { EvmChain } from "@axelar-network/axelarjs-sdk";
 import { ethers } from "ethers";
@@ -63,15 +66,15 @@ async function approveAll(tokens: { address: string; name: string }[]) {
 
 (async () => {
   console.log(`==== Your balance ==== `);
-  const ustBalance = await getBalance(TOKEN.UST);
+  const ustBalance = await getBalance(TOKEN[EvmChain.AVALANCHE].UST);
   console.log(ethers.utils.formatUnits(ustBalance, 6), ust);
-  const lunaBalance = await getBalance(TOKEN.LUNA);
+  const lunaBalance = await getBalance(TOKEN[EvmChain.AVALANCHE].LUNA);
   console.log(ethers.utils.formatUnits(lunaBalance, 6), luna);
 
   // Approve tokens to Gateway Contract
   await approveAll([
-    { address: TOKEN.UST, name: ust },
-    { address: TOKEN.LUNA, name: luna },
+    { address: TOKEN[EvmChain.AVALANCHE].UST, name: ust },
+    { address: TOKEN[EvmChain.AVALANCHE].LUNA, name: luna },
   ]);
 
   console.log("\n==== Call contract with token ====");

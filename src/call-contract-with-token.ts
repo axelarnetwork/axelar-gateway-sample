@@ -1,3 +1,6 @@
+// Initial state: 10 UST on Avalanche Fuji Testnet
+// Goal: 10 UST on Ethereum Ropsten
+
 import "dotenv/config";
 import {
   AxelarGateway,
@@ -38,15 +41,17 @@ async function isRequireApprove(address: string) {
 
 (async () => {
   console.log(`==== Your ${tokenSymbol} balance ==== `);
-  const tokenBalance = await getBalance(TOKEN[tokenSymbol]);
+  const tokenBalance = await getBalance(TOKEN[EvmChain.AVALANCHE][tokenSymbol]);
   console.log(ethers.utils.formatUnits(tokenBalance, 6), tokenSymbol);
 
   // Approve token to Gateway Contract
-  const requiredApprove = await isRequireApprove(TOKEN.UST);
+  const requiredApprove = await isRequireApprove(
+    TOKEN[EvmChain.AVALANCHE][tokenSymbol]
+  );
   if (requiredApprove) {
     console.log(`\n==== Approving ${tokenSymbol}... ====`);
     const receipt = await gateway
-      .createApproveTx({ tokenAddress: TOKEN[tokenSymbol] })
+      .createApproveTx({ tokenAddress: TOKEN[EvmChain.AVALANCHE][tokenSymbol] })
       .then((tx) => tx.send(evmWallet))
       .then((tx) => tx.wait());
     console.log(
