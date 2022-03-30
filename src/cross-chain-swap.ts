@@ -61,7 +61,7 @@ const luna = "LUNA";
   // Approve UST and LUNA to Uniswap Router at the destination chain if needed.
   await approveAll(
     [
-      { name: ust, address: TOKEN[destChain].LUNA },
+      { name: ust, address: TOKEN[destChain].UST },
       { name: luna, address: TOKEN[destChain].LUNA },
     ],
     UNISWAP_ROUTER[destChain],
@@ -75,6 +75,7 @@ const luna = "LUNA";
     evmWallet.connect(destProvider)
   );
   const deadline = Math.floor(new Date().getTime() / 1000) + 60 * 20;
+  console.log(`\n==== Adding LP to the router contract... ====`);
   const receipt = await contract
     .addLiquidity(
       TOKEN[destChain].LUNA,
@@ -88,6 +89,6 @@ const luna = "LUNA";
     )
     .then((tx) => tx.wait());
   console.log(
-    `Added LP transaction ${EXPLORER_TX[destChain] + receipt.transactionHash}`
+    `\nAdded LP transaction ${EXPLORER_TX[destChain] + receipt.transactionHash}`
   );
 })();
