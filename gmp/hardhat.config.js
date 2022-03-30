@@ -23,6 +23,7 @@ module.exports = {
     apiKey: {
       ropsten: process.env.ETHERSCAN_API_KEY,
       avalancheFujiTestnet: process.env.SNOWTRACE_API_KEY,
+      moonbaseAlpha: process.env.MOONSCAN_API_KEY,
     },
   },
 };
