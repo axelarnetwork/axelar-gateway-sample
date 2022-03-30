@@ -1,8 +1,8 @@
-require("@nomiclabs/hardhat-waffle");
-require("@nomiclabs/hardhat-etherscan");
+import "@nomiclabs/hardhat-waffle";
+import "@nomiclabs/hardhat-etherscan";
 require("dotenv").config({ path: __dirname + "/.env" });
 
-module.exports = {
+export default {
   defaultNetwork: "ropsten",
   solidity: "0.8.9",
   networks: {
