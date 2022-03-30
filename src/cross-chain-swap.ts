@@ -3,7 +3,7 @@
 import "dotenv/config";
 import { EvmChain } from "@axelar-network/axelarjs-sdk";
 import { ethers } from "ethers";
-import { TOKEN, UNISWAP_ROUTER } from "./constants/address";
+import { GATEWAY, TOKEN, UNISWAP_ROUTER } from "./constants/address";
 import { getProvider } from "./providers";
 import uniswapRouterAbi from "./abi/uniswapRouter.json";
 import { approveAll, getBalance } from "./utils/token";
@@ -90,5 +90,12 @@ const luna = "LUNA";
     .then((tx) => tx.wait());
   console.log(
     `\nAdded LP transaction ${EXPLORER_TX[destChain] + receipt.transactionHash}`
+  );
+
+  // Approve UST to the gateway contract at the source chain if needed.
+  await approveAll(
+    [{ name: ust, address: TOKEN[chain].UST }],
+    GATEWAY[chain],
+    chain
   );
 })();
