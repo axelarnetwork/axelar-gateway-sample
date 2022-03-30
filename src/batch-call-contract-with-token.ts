@@ -9,6 +9,7 @@ import { evmWallet } from "./wallet";
 import {
   BATCH_MESSAGE_SENDER,
   DISTRIBUTION_EXECUTOR,
+  GATEWAY,
   TOKEN,
 } from "./constants/address";
 import { getProvider } from "./providers";
@@ -35,6 +36,7 @@ const luna = "LUNA";
       { address: TOKEN[chain].UST, name: ust },
       { address: TOKEN[chain].LUNA, name: luna },
     ],
+    GATEWAY[chain],
     chain
   );
 

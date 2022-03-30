@@ -9,14 +9,15 @@ import {
 } from "@axelar-network/axelarjs-sdk";
 import { ethers } from "ethers";
 import { evmWallet } from "./wallet";
-import { DISTRIBUTION_EXECUTOR, TOKEN } from "./constants/address";
+import { DISTRIBUTION_EXECUTOR, GATEWAY, TOKEN } from "./constants/address";
 import { getProvider } from "./providers";
-import { getBalance, isRequireApprove } from "./utils/token";
+import { approveAll, getBalance, isRequireApprove } from "./utils/token";
 
 // Config your own here.
 const chain = EvmChain.AVALANCHE;
+const destChain = EvmChain.MOONBEAM;
 const provider = getProvider(chain);
-const amount = ethers.utils.parseUnits("10", 6).toString();
+const amount = ethers.utils.parseUnits("100", 6).toString();
 const tokenSymbol = "UST";
 const gateway = AxelarGateway.create(Environment.DEVNET, chain, provider);
 
@@ -26,29 +27,19 @@ const gateway = AxelarGateway.create(Environment.DEVNET, chain, provider);
   console.log(ethers.utils.formatUnits(tokenBalance, 6), tokenSymbol);
 
   // Approve token to Gateway Contract if needed
-  const requiredApprove = await isRequireApprove(
-    TOKEN[EvmChain.AVALANCHE][tokenSymbol],
+  await approveAll(
+    [{ address: TOKEN[chain][tokenSymbol], name: tokenSymbol }],
+    GATEWAY[chain],
     chain
   );
-  if (requiredApprove) {
-    console.log(`\n==== Approving ${tokenSymbol}... ====`);
-    const receipt = await gateway
-      .createApproveTx({ tokenAddress: TOKEN[EvmChain.AVALANCHE][tokenSymbol] })
-      .then((tx) => tx.send(evmWallet))
-      .then((tx) => tx.wait());
-    console.log(
-      `${tokenSymbol} has been approved to gateway contract`,
-      receipt.transactionHash
-    );
-  }
 
   console.log("\n==== Call contract with token ====");
   const encoder = ethers.utils.defaultAbiCoder;
-  const payload = encoder.encode(["address[]"], [evmWallet.address]);
+  const payload = encoder.encode(["address[]"], [[evmWallet.address]]);
   const callContractReceipt = await gateway
     .createCallContractWithTokenTx({
-      destinationChain: EvmChain.ETHEREUM,
-      destinationContractAddress: DISTRIBUTION_EXECUTOR[EvmChain.ETHEREUM],
+      destinationChain: destChain,
+      destinationContractAddress: DISTRIBUTION_EXECUTOR[destChain],
       payload,
       amount,
       symbol: tokenSymbol,

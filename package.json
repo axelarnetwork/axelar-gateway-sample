@@ -7,6 +7,7 @@
     "send-terra": "ts-node src/send-token-terra-to-evm.ts",
     "call-contract": "ts-node src/call-contract-with-token.ts",
     "batch-call-contract": "ts-node src/batch-call-contract-with-token.ts",
+    "cross-chain-swap": "ts-node src/cross-chain-swap.ts",
     "deploy": "cd example-contracts && npx hardhat run scripts/deploy.js",
     "verify": "cd example-contracts && npx hardhat verify"
   },
