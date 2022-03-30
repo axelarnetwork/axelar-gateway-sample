@@ -8,45 +8,28 @@ import {
   EvmChain,
 } from "@axelar-network/axelarjs-sdk";
 import { ethers } from "ethers";
-import erc20Abi from "./abi/erc20.json";
 import { evmWallet } from "./wallet";
 import { DISTRIBUTION_EXECUTOR, TOKEN } from "./constants/address";
-import { RPC_ENDPOINT } from "./constants/endpoint";
+import { getProvider } from "./providers";
+import { getBalance, isRequireApprove } from "./utils/token";
 
 // Config your own here.
-const provider = new ethers.providers.JsonRpcProvider(
-  RPC_ENDPOINT[EvmChain.AVALANCHE]
-);
+const chain = EvmChain.AVALANCHE;
+const provider = getProvider(chain);
 const amount = ethers.utils.parseUnits("10", 6).toString();
 const tokenSymbol = "UST";
-const gateway = AxelarGateway.create(
-  Environment.DEVNET,
-  EvmChain.AVALANCHE,
-  provider
-);
-
-function getBalance(address: string) {
-  const contract = new ethers.Contract(address, erc20Abi, provider);
-  return contract.balanceOf(evmWallet.address);
-}
-
-async function isRequireApprove(address: string) {
-  const contract = new ethers.Contract(address, erc20Abi, provider);
-  const allowance: ethers.BigNumber = await contract.allowance(
-    evmWallet.address,
-    gateway.getContract().address
-  );
-  return allowance.isZero();
-}
+const gateway = AxelarGateway.create(Environment.DEVNET, chain, provider);
 
 (async () => {
   console.log(`==== Your ${tokenSymbol} balance ==== `);
-  const tokenBalance = await getBalance(TOKEN[EvmChain.AVALANCHE][tokenSymbol]);
+  const tokenBalance = await getBalance(TOKEN[chain][tokenSymbol], chain);
   console.log(ethers.utils.formatUnits(tokenBalance, 6), tokenSymbol);
 
-  // Approve token to Gateway Contract
+  // Approve token to Gateway Contract if needed
   const requiredApprove = await isRequireApprove(
-    TOKEN[EvmChain.AVALANCHE][tokenSymbol]
+    TOKEN[EvmChain.AVALANCHE][tokenSymbol],
+    gateway.getContract().address,
+    chain
   );
   if (requiredApprove) {
     console.log(`\n==== Approving ${tokenSymbol}... ====`);
