@@ -1,9 +1,19 @@
 // Initial state: 0.01 AVAX, 10 UST on Avalanche
 // Goal: Added LP 0.01 AVAX / 10 UST on Moonbeam
 import "dotenv/config";
-import { EvmChain } from "@axelar-network/axelarjs-sdk";
+import {
+  AxelarGateway,
+  Environment,
+  EvmChain,
+} from "@axelar-network/axelarjs-sdk";
 import { ethers } from "ethers";
-import { GATEWAY, TOKEN, UNISWAP_ROUTER } from "./constants/address";
+import {
+  DISTRIBUTION_EXECUTOR,
+  GATEWAY,
+  SWAP_EXECUTOR,
+  TOKEN,
+  UNISWAP_ROUTER,
+} from "./constants/address";
 import { getProvider } from "./providers";
 import uniswapRouterAbi from "./abi/uniswapRouter.json";
 import { approveAll, getBalance } from "./utils/token";
@@ -17,7 +27,7 @@ const srcProvider = getProvider(chain);
 const destProvider = getProvider(destChain);
 const ustAmountForLP = ethers.utils.parseUnits("10", 6).toString();
 const lunaAmountForLP = ethers.utils.parseUnits("2", 5).toString();
-const ustAmountForSwap = ethers.utils.parseUnits("2", 6).toString();
+const ustAmountForSwap = ethers.utils.parseUnits("5", 6).toString();
 const ust = "UST";
 const luna = "LUNA";
 
@@ -89,7 +99,7 @@ const luna = "LUNA";
     )
     .then((tx) => tx.wait());
   console.log(
-    `\nAdded LP transaction ${EXPLORER_TX[destChain] + receipt.transactionHash}`
+    `Added LP transaction: ${EXPLORER_TX[destChain] + receipt.transactionHash}`
   );
 
   // Approve UST to the gateway contract at the source chain if needed.
@@ -97,5 +107,33 @@ const luna = "LUNA";
     [{ name: ust, address: TOKEN[chain].UST }],
     GATEWAY[chain],
     chain
+  );
+
+  // Swap 5 UST to luna
+  console.log("\n==== Call contract with token ====");
+  const encoder = ethers.utils.defaultAbiCoder;
+  const payload = encoder.encode(
+    ["address[]", "string", "address", "string"],
+    [
+      [TOKEN[destChain].UST, TOKEN[destChain].LUNA],
+      chain,
+      evmWallet.address,
+      DISTRIBUTION_EXECUTOR[chain],
+    ]
+  );
+  const gateway = AxelarGateway.create(Environment.DEVNET, chain, srcProvider);
+  const callContractReceipt = await gateway
+    .createCallContractWithTokenTx({
+      destinationChain: destChain,
+      destinationContractAddress: SWAP_EXECUTOR[destChain],
+      payload,
+      symbol: ust,
+      amount: ustAmountForSwap,
+    })
+    .then((tx) => tx.send(evmWallet.connect(srcProvider)))
+    .then((tx) => tx.wait());
+  console.log(
+    "Call contract with token tx:",
+    EXPLORER_TX[chain] + callContractReceipt.transactionHash
   );
 })();
