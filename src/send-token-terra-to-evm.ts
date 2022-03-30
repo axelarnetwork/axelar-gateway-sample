@@ -1,3 +1,6 @@
+// Initial state: 10 UST on Terra
+// Goal: 10 UST on Avalanche
+
 import "dotenv/config";
 import {
   GetDepositAddressPayload,
@@ -13,8 +16,8 @@ import { evmWallet, terraWallet } from "./wallet";
 
 // Config your own here.
 const recipientAddress = evmWallet.address;
-const transferToken = "uluna"; // can be either uusd or uluna
-const transferAmount = ethers.utils.parseUnits("4", 6); // 10 UST
+const transferToken = "uusd"; // can be either uusd or uluna
+const transferAmount = ethers.utils.parseUnits("10", 6); // 10 UST
 
 async function getDepositAddress(destinationAddress: string, env = "devnet") {
   const client = new TransferAssetBridge(env);
