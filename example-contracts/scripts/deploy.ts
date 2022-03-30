@@ -1,28 +1,44 @@
 import hre from "hardhat";
-import { GATEWAY } from "./constants/address";
+import { GATEWAY, UNISWAP_ROUTER } from "./constants/address";
 import { EvmChain } from "@axelar-network/axelarjs-sdk";
 
-async function deployDistributionExecutor(gatewayAddress: string) {
+async function deployDistributionExecutor(chain: EvmChain) {
+  console.log(`==== Deploying DistributionExecutor on ${chain}... ====`);
   const Executor = await hre.ethers.getContractFactory("DistributionExecutor");
+  const gatewayAddress = GATEWAY[chain];
   const executor = await Executor.deploy(gatewayAddress);
   await executor.deployed();
   console.log("Executor deployed to:", executor.address);
 }
 
-async function deployBatchMessageSender(gatewayAddress: string) {
+async function deployBatchMessageSender(chain: EvmChain) {
+  console.log(`==== Deploying BatchMessageSender on ${chain}... ====`);
   const BatchMessageSender = await hre.ethers.getContractFactory(
     "BatchMessageSender"
   );
+  const gatewayAddress = GATEWAY[chain];
   const batchMessageSender = await BatchMessageSender.deploy(gatewayAddress);
   await batchMessageSender.deployed();
   console.log("BatchMessageSender deployed to:", batchMessageSender.address);
 }
 
-const chain = EvmChain.MOONBEAM;
-const gatewayAddress = GATEWAY[chain];
+async function deploySwapExecutor(chain: EvmChain) {
+  console.log(`==== Deploying SwapExecutor on ${chain}... ====`);
+  const gatewayAddress = GATEWAY[chain];
+  const routerAddress = UNISWAP_ROUTER[chain];
+  const SwapExecutor = await hre.ethers.getContractFactory("SwapExecutor");
+  const executor = await SwapExecutor.deploy(
+    gatewayAddress,
+    routerAddress,
+    chain
+  );
+  await executor.deployed();
+  console.log("SwapExecutor deployed to:", executor.address);
+}
 
-deployDistributionExecutor(gatewayAddress)
-  .then(() => deployBatchMessageSender(gatewayAddress))
+const chain = EvmChain.ETHEREUM;
+
+deploySwapExecutor(chain)
   .then(() => process.exit(0))
   .catch((error) => {
     console.error(error);
