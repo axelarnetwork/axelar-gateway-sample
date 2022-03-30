@@ -3,6 +3,6 @@
     "resolveJsonModule": true,
     "esModuleInterop": true
   },
-  "include": ["src", "gmp"],
+  "include": ["src", "example-contracts"],
   "exclude": ["node_modules"]
 }
