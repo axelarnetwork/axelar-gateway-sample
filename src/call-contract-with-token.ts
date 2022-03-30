@@ -28,7 +28,6 @@ const gateway = AxelarGateway.create(Environment.DEVNET, chain, provider);
   // Approve token to Gateway Contract if needed
   const requiredApprove = await isRequireApprove(
     TOKEN[EvmChain.AVALANCHE][tokenSymbol],
-    gateway.getContract().address,
     chain
   );
   if (requiredApprove) {
