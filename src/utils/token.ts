@@ -45,10 +45,7 @@ export async function approveAll(
       const receipt = await approve(token.address, chain).then((tx) =>
         tx.wait()
       );
-      console.log(
-        `${token.name} has been approved to BatchMessageSender`,
-        receipt.transactionHash
-      );
+      console.log(`${token.name} has been approved`, receipt.transactionHash);
     }
   }
 }
