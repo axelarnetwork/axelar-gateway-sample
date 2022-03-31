@@ -12,12 +12,13 @@ import { evmWallet } from "./wallet";
 import { DISTRIBUTION_EXECUTOR, GATEWAY, TOKEN } from "./constants/address";
 import { getProvider } from "./providers";
 import { approveAll, getBalance, isRequireApprove } from "./utils/token";
+import { EXPLORER_TX } from "./constants/endpoint";
 
 // Config your own here.
-const chain = EvmChain.AVALANCHE;
-const destChain = EvmChain.MOONBEAM;
+const chain = EvmChain.MOONBEAM;
+const destChain = EvmChain.AVALANCHE;
 const provider = getProvider(chain);
-const amount = ethers.utils.parseUnits("100", 6).toString();
+const amount = ethers.utils.parseUnits("5", 6).toString();
 const tokenSymbol = "UST";
 const gateway = AxelarGateway.create(Environment.DEVNET, chain, provider);
 
@@ -49,6 +50,6 @@ const gateway = AxelarGateway.create(Environment.DEVNET, chain, provider);
 
   console.log(
     "Call contract with token tx:",
-    `https://testnet.snowtrace.io/tx/${callContractReceipt.transactionHash}`
+    `${EXPLORER_TX[chain]}${callContractReceipt.transactionHash}`
   );
 })();
