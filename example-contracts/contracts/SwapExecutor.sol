@@ -34,24 +34,13 @@ contract SwapExecutor is IAxelarExecutable {
 
         address tokenAddress = gateway.tokenAddresses(tokenSymbol);
 
-        bool insufficientAllowance = IERC20(tokenAddress).allowance(
-            address(this),
-            address(router)
-        ) < amount;
+        // Approve token to router before swap
+        _approveIfNeeded(tokenAddress, address(router), amount);
 
-        if (insufficientAllowance) {
-            (bool approveSuccessful, ) = address(tokenAddress).call(
-                abi.encodeWithSignature(
-                    "approve(address,uint256)",
-                    address(router),
-                    type(uint256).max
-                )
-            );
-            require(approveSuccessful, "Fail to approve");
-        }
         bool isRecipientChain = keccak256(bytes(chain)) ==
             keccak256(bytes(recipientChain));
 
+        // Swap and store returned amount
         uint256[] memory outputAmounts = router.swapExactTokensForTokens(
             amount,
             0,
@@ -60,16 +49,41 @@ contract SwapExecutor is IAxelarExecutable {
             block.timestamp
         );
 
+        // If the recipient chain is not this chain, then send it cross-chain one more time through the axelar gateway.
         if (!isRecipientChain) {
             string memory symbol = IERC20(swapPath[swapPath.length - 1])
                 .symbol();
+            uint256 outputAmount = outputAmounts[outputAmounts.length - 1];
+            _approveIfNeeded(tokenAddress, address(gateway), outputAmount);
             gateway.callContractWithToken(
                 recipientChain,
                 recipientContractAddress,
                 abi.encode([recipientAddress]),
                 symbol,
-                outputAmounts[outputAmounts.length - 1]
+                outputAmount
             );
+        }
+    }
+
+    function _approveIfNeeded(
+        address tokenAddress,
+        address spender,
+        uint256 requiredAmount
+    ) private {
+        bool insufficientAllowance = IERC20(tokenAddress).allowance(
+            address(this),
+            address(router)
+        ) < requiredAmount;
+
+        if (insufficientAllowance) {
+            (bool approveSuccessful, ) = address(tokenAddress).call(
+                abi.encodeWithSignature(
+                    "approve(address,uint256)",
+                    spender,
+                    type(uint256).max
+                )
+            );
+            require(approveSuccessful, "Fail to approve");
         }
     }
 }
