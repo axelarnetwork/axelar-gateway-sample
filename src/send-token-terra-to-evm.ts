@@ -17,7 +17,7 @@ import { evmWallet, terraWallet } from "./wallet";
 // Config your own here.
 const recipientAddress = evmWallet.address;
 const transferToken = "uusd"; // can be either uusd or uluna
-const transferAmount = ethers.utils.parseUnits("10", 6); // 10 UST
+const transferAmount = ethers.utils.parseUnits("100", 6); // 10 UST
 
 async function getDepositAddress(destinationAddress: string, env = "devnet") {
   const client = new TransferAssetBridge(env);
@@ -45,20 +45,24 @@ async function getDepositAddress(destinationAddress: string, env = "devnet") {
 
   // Generate deposit address
   console.log("\n==== Generating deposit address... ====");
-  const depositAddress = await getDepositAddress(recipientAddress);
-  console.log("Deposit Address:", depositAddress);
+  try {
+    const depositAddress = await getDepositAddress(recipientAddress);
+    console.log("Deposit Address:", depositAddress);
 
-  // IBC transfer UST token
-  const transferCoin = coins.get(transferToken);
-  const ibcMsg = createIBCTransferMsg(
-    terraWallet.key.accAddress,
-    depositAddress,
-    transferCoin.denom,
-    transferAmount.toString()
-  );
-  const receipt = await signAndBroadcast(terraWallet, ibcMsg);
-  console.log(
-    "IBC Tx:",
-    "https://finder.terra.money/testnet/tx/" + receipt.txhash
-  );
+    // IBC transfer UST token
+    const transferCoin = coins.get(transferToken);
+    const ibcMsg = createIBCTransferMsg(
+      terraWallet.key.accAddress,
+      depositAddress,
+      transferCoin.denom,
+      transferAmount.toString()
+    );
+    const receipt = await signAndBroadcast(terraWallet, ibcMsg);
+    console.log(
+      "IBC Tx:",
+      "https://finder.terra.money/testnet/tx/" + receipt.txhash
+    );
+  } catch (e) {
+    console.log(e);
+  }
 })();
