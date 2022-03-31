@@ -54,11 +54,18 @@ contract SwapExecutor is IAxelarExecutable {
             string memory symbol = IERC20(swapPath[swapPath.length - 1])
                 .symbol();
             uint256 outputAmount = outputAmounts[outputAmounts.length - 1];
-            _approveIfNeeded(tokenAddress, address(gateway), outputAmount);
+            address outputTokenAddress = gateway.tokenAddresses(symbol);
+            address[] memory recipients = new address[](1);
+            recipients[0] = recipientAddress;
+            _approveIfNeeded(
+                outputTokenAddress,
+                address(gateway),
+                outputAmount
+            );
             gateway.callContractWithToken(
                 recipientChain,
                 recipientContractAddress,
-                abi.encode([recipientAddress]),
+                abi.encode(recipients),
                 symbol,
                 outputAmount
             );
@@ -72,7 +79,7 @@ contract SwapExecutor is IAxelarExecutable {
     ) private {
         bool insufficientAllowance = IERC20(tokenAddress).allowance(
             address(this),
-            address(router)
+            spender
         ) < requiredAmount;
 
         if (insufficientAllowance) {
