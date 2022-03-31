@@ -3,6 +3,7 @@
 
 import "dotenv/config";
 import {
+  EvmChain,
   GetDepositAddressPayload,
   TransferAssetBridge,
 } from "@axelar-network/axelarjs-sdk";
@@ -16,6 +17,7 @@ import { evmWallet, terraWallet } from "./wallet";
 
 // Config your own here.
 const recipientAddress = evmWallet.address;
+const destChain = EvmChain.AVALANCHE;
 const transferToken = "uusd"; // can be either uusd or uluna
 const transferAmount = ethers.utils.parseUnits("100", 6); // 10 UST
 
@@ -23,7 +25,7 @@ async function getDepositAddress(destinationAddress: string, env = "devnet") {
   const client = new TransferAssetBridge(env);
   const payload: GetDepositAddressPayload = {
     fromChain: "terra",
-    toChain: "avalanche",
+    toChain: destChain,
     asset: transferToken,
     destinationAddress,
   };
