@@ -34,11 +34,22 @@ async function deploySwapExecutor(chain: EvmChain) {
   );
   await executor.deployed();
   console.log("SwapExecutor deployed to:", executor.address);
+  return executor.address;
 }
 
-const chain = EvmChain.ETHEREUM;
+async function verify(address: string, args: any[]) {
+  return hre.run("verify:verify", {
+    address,
+    constructorArguments: args,
+  });
+}
+
+const chain = EvmChain.MOONBEAM;
 
 deploySwapExecutor(chain)
+  .then((address) =>
+    verify(address, [GATEWAY[chain], UNISWAP_ROUTER[chain], chain])
+  )
   .then(() => process.exit(0))
   .catch((error) => {
     console.error(error);
