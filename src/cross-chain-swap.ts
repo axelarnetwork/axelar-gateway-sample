@@ -22,15 +22,24 @@ import { evmWallet } from "./wallet";
 import { EXPLORER_TX } from "./constants/endpoint";
 
 // Config your own here.
+// Source chain
 const chain = EvmChain.AVALANCHE;
+
+// The chain that you want to swap a token
 const destChain = EvmChain.MOONBEAM;
+
+// The chain that you want to receive a token after swap.
+const receiveChain = EvmChain.MOONBEAM;
+
 const srcProvider = getProvider(chain);
 const destProvider = getProvider(destChain);
-const ustAmountForLP = ethers.utils.parseUnits("10", 6).toString();
-const lunaAmountForLP = ethers.utils.parseUnits("2", 5).toString();
 const ustAmountForSwap = ethers.utils.parseUnits("5", 6).toString();
 const ust = "UST";
 const luna = "LUNA";
+
+// Tx might be failed if you change the amount without keeping the ratio the same.
+const ustAmountForLP = ethers.utils.parseUnits("10", 6).toString();
+const lunaAmountForLP = ethers.utils.parseUnits("2", 5).toString();
 
 (async () => {
   // Check balance both source chain and destination chain
@@ -117,9 +126,9 @@ const luna = "LUNA";
     ["address[]", "string", "address", "string"],
     [
       [TOKEN[destChain].UST, TOKEN[destChain].LUNA],
-      chain,
+      receiveChain,
       evmWallet.address,
-      DISTRIBUTION_EXECUTOR[chain],
+      DISTRIBUTION_EXECUTOR[receiveChain],
     ]
   );
   const gateway = AxelarGateway.create(Environment.DEVNET, chain, srcProvider);
