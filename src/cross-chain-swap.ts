@@ -1,5 +1,6 @@
-// Initial state: 0.01 AVAX, 10 UST on Avalanche
-// Goal: Added LP 0.01 AVAX / 10 UST on Moonbeam
+// Initial state: 5 UST on Avalanche
+// Goal: Swap 5 UST to Luna at Moonbeam and send Luna back to Avalanche.
+
 import "dotenv/config";
 import {
   AxelarGateway,
