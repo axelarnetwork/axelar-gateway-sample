@@ -7,7 +7,7 @@ This repo demonstrates the usage of `AxelarGateway` of the `@axelar-network/axel
 1. Clone this repo
 2. Run `npm install`
 3. Rename `.env.sample` into `.env` and config the value there.
-4. Choose the use-case you want to run. See the [example use-cases](#example-use-cases) below.
+4. Choose the use-case to run. See the [example use-cases](#example-use-cases) below.
    > Note: make sure that you have enough fund in your wallet. Some use-case requires you to have fund at the destination chain as well.
 
 ## Example use-cases

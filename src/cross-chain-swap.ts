@@ -100,7 +100,9 @@ const toTokenKey = toToken.toUpperCase();
     evmWallet.connect(destProvider)
   );
   const deadline = Math.floor(new Date().getTime() / 1000) + 60 * 20; // 20 mins
-  console.log(`\n==== Adding LP to the router contract... ====`);
+  console.log(
+    `\n==== Adding ${fromTokenKey} and ${toTokenKey} to the ${destChain} router contract ... ====`
+  );
   const receipt = await contract
     .addLiquidity(
       TOKEN[destChain][fromTokenKey],
@@ -125,7 +127,12 @@ const toTokenKey = toToken.toUpperCase();
   );
 
   // Swap 5 UST to luna
-  console.log("\n==== Call contract with token ====");
+  console.log(
+    `\n==== Sending swap payload with ${ethers.utils.formatUnits(
+      fromTokenAmountForSwap,
+      6
+    )} ${fromTokenKey} to the gateway contract on ${srcChain} ====`
+  );
   const encoder = ethers.utils.defaultAbiCoder;
   const payload = encoder.encode(
     ["address[]", "string", "address", "string"],
@@ -152,7 +159,7 @@ const toTokenKey = toToken.toUpperCase();
     .then((tx) => tx.send(evmWallet.connect(srcProvider)))
     .then((tx) => tx.wait());
   console.log(
-    "Call contract with token tx:",
+    "Sending swap payload tx:",
     EXPLORER_TX[srcChain] + callContractReceipt.transactionHash
   );
 })();
