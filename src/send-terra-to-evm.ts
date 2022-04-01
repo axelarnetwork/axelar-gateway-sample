@@ -51,7 +51,7 @@ async function getDepositAddress(destinationAddress: string, env = "devnet") {
     const depositAddress = await getDepositAddress(recipientAddress);
     console.log("Deposit Address:", depositAddress);
 
-    // IBC transfer UST token
+    // IBC transfer `transferToken`
     const transferCoin = coins.get(transferToken);
     const ibcMsg = createIBCTransferMsg(
       terraWallet.key.accAddress,

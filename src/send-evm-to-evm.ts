@@ -7,35 +7,44 @@ import {
   Environment,
   EvmChain,
 } from "@axelar-network/axelarjs-sdk";
+import { DISTRIBUTION_EXECUTOR, GATEWAY, TOKEN } from "./constants/address";
+import { EXPLORER_TX } from "./constants/endpoint";
 import { ethers } from "ethers";
 import { evmWallet } from "./wallet";
-import { DISTRIBUTION_EXECUTOR, GATEWAY, TOKEN } from "./constants/address";
 import { getProvider } from "./providers";
 import { approveAll, getBalance } from "./utils/token";
-import { EXPLORER_TX } from "./constants/endpoint";
 
 // Config your own here.
-const chain = EvmChain.MOONBEAM;
-const destChain = EvmChain.AVALANCHE;
-const provider = getProvider(chain);
-const amount = ethers.utils.parseUnits("5", 6).toString();
-const tokenSymbol = "UST";
-const gateway = AxelarGateway.create(Environment.DEVNET, chain, provider);
+const srcChain = EvmChain.AVALANCHE;
+const destChain = EvmChain.MOONBEAM;
+const transferToken = "UST";
+const transferAmount = ethers.utils.parseUnits("50", 6).toString();
+
+const provider = getProvider(srcChain);
+const gateway = AxelarGateway.create(Environment.DEVNET, srcChain, provider);
 
 (async () => {
   gateway.getContract().interface.functions;
-  console.log(`==== Your ${tokenSymbol} balance ==== `);
-  const tokenBalance = await getBalance(TOKEN[chain][tokenSymbol], chain);
-  console.log(ethers.utils.formatUnits(tokenBalance, 6), tokenSymbol);
+  console.log(`==== Your ${transferToken} balance on ${srcChain} ==== `);
+  const tokenBalance = await getBalance(
+    TOKEN[srcChain][transferToken],
+    srcChain
+  );
+  console.log(ethers.utils.formatUnits(tokenBalance, 6), transferToken);
 
   // Approve token to Gateway Contract if needed
   await approveAll(
-    [{ address: TOKEN[chain][tokenSymbol], name: tokenSymbol }],
-    GATEWAY[chain],
-    chain
+    [{ address: TOKEN[srcChain][transferToken], name: transferToken }],
+    GATEWAY[srcChain],
+    srcChain
   );
 
-  console.log("\n==== Call contract with token ====");
+  console.log(
+    `\n==== Sending ${ethers.utils.formatUnits(
+      transferAmount,
+      6
+    )} ${transferToken} from ${srcChain} to ${destChain} ====`
+  );
   const encoder = ethers.utils.defaultAbiCoder;
   const payload = encoder.encode(["address[]"], [[evmWallet.address]]);
   const callContractReceipt = await gateway
@@ -43,14 +52,14 @@ const gateway = AxelarGateway.create(Environment.DEVNET, chain, provider);
       destinationChain: destChain,
       destinationContractAddress: DISTRIBUTION_EXECUTOR[destChain],
       payload,
-      amount,
-      symbol: tokenSymbol,
+      amount: transferAmount,
+      symbol: transferToken,
     })
     .then((tx) => tx.send(evmWallet.connect(provider)))
     .then((tx) => tx.wait());
 
   console.log(
     "Call contract with token tx:",
-    `${EXPLORER_TX[chain]}${callContractReceipt.transactionHash}`
+    `${EXPLORER_TX[srcChain]}${callContractReceipt.transactionHash}`
   );
 })();

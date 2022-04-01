@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { MnemonicKey } from "@terra-money/terra.js";
-import { lcdClient } from "./utils/terra";
+import { lcdClient } from "../utils/terra";
 import { ethers } from "ethers";
 
 const mnemonic = process.env.TERRA_MNEMONIC;

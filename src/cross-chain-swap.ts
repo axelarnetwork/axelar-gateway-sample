@@ -22,67 +22,72 @@ import { evmWallet } from "./wallet";
 import { EXPLORER_TX } from "./constants/endpoint";
 
 // Config your own here.
-// Source chain
-const chain = EvmChain.AVALANCHE;
-
-// The chain that you want to swap a token
+const srcChain = EvmChain.AVALANCHE;
 const destChain = EvmChain.MOONBEAM;
+const recipientChain = EvmChain.AVALANCHE;
+const fromToken = "UST";
+const toToken = "LUNA";
+// Should not be too large compare to the liquidity size.
+const fromTokenAmountForSwap = ethers.utils.parseUnits("5", 6).toString();
+// Tx might be failed if you change the lp amount without keeping the ratio the same.
+const fromTokenAmountForLP = ethers.utils.parseUnits("10", 6).toString();
+const toTokenAmountForLP = ethers.utils.parseUnits("2", 5).toString();
 
-// The chain that you want to receive a token after swap.
-const receiveChain = EvmChain.MOONBEAM;
-
-const srcProvider = getProvider(chain);
+const srcProvider = getProvider(srcChain);
 const destProvider = getProvider(destChain);
-const ustAmountForSwap = ethers.utils.parseUnits("5", 6).toString();
-const ust = "UST";
-const luna = "LUNA";
-
-// Tx might be failed if you change the amount without keeping the ratio the same.
-const ustAmountForLP = ethers.utils.parseUnits("10", 6).toString();
-const lunaAmountForLP = ethers.utils.parseUnits("2", 5).toString();
-
+const fromTokenKey = fromToken.toUpperCase();
+const toTokenKey = toToken.toUpperCase();
 (async () => {
   // Check balance both source chain and destination chain
-  console.log(`==== Your source chain balance (${chain}) ==== `);
-  const sourceUstBalance = await getBalance(TOKEN[chain].UST, chain);
-  console.log(ethers.utils.formatUnits(sourceUstBalance, 6), ust);
-  const sourceLunaBalance = await getBalance(TOKEN[chain].LUNA, chain);
-  console.log(ethers.utils.formatUnits(sourceLunaBalance, 6), luna);
+  console.log(`==== Your source chain balance (${srcChain}) ==== `);
+  const fromTokenBalance = await getBalance(
+    TOKEN[srcChain][fromTokenKey],
+    srcChain
+  );
+  console.log(ethers.utils.formatUnits(fromTokenBalance, 6), fromToken);
+  const toTokenBalance = await getBalance(
+    TOKEN[srcChain][toTokenKey],
+    srcChain
+  );
+  console.log(ethers.utils.formatUnits(toTokenBalance, 6), toToken);
 
   console.log(`\n==== Your destination chain balance (${destChain}) ==== `);
-  const destinationUstBalance = await getBalance(
-    TOKEN[destChain].UST,
+  const destinationFromTokenBalance = await getBalance(
+    TOKEN[destChain][fromTokenKey],
     destChain
   );
-  console.log(ethers.utils.formatUnits(destinationUstBalance, 6), ust);
-  const destinationLunaBalance = await getBalance(
-    TOKEN[destChain].LUNA,
+  console.log(
+    ethers.utils.formatUnits(destinationFromTokenBalance, 6),
+    fromToken
+  );
+  const destinationToTokenBalance = await getBalance(
+    TOKEN[destChain][toTokenKey],
     destChain
   );
-  console.log(ethers.utils.formatUnits(destinationLunaBalance, 6), luna);
+  console.log(ethers.utils.formatUnits(destinationToTokenBalance, 6), toToken);
 
-  if (destinationLunaBalance.lt(lunaAmountForLP)) {
+  if (destinationToTokenBalance.lt(toTokenAmountForLP)) {
     return console.log(
-      `\nNot enough ${luna}, needed ${ethers.utils.formatUnits(
-        lunaAmountForLP,
+      `\nNot enough ${toToken}, needed ${ethers.utils.formatUnits(
+        toTokenAmountForLP,
         6
-      )} ${luna}`
+      )} ${toToken}`
     );
   }
-  if (destinationUstBalance.lt(ustAmountForLP)) {
+  if (destinationFromTokenBalance.lt(fromTokenAmountForLP)) {
     return console.log(
-      `\nNot enough ${ust}, needed ${ethers.utils.formatUnits(
-        ustAmountForLP,
+      `\nNot enough ${fromToken}, needed ${ethers.utils.formatUnits(
+        fromTokenAmountForLP,
         6
-      )} ${ust}`
+      )} ${fromToken}`
     );
   }
 
   // Approve UST and LUNA to Uniswap Router at the destination chain if needed.
   await approveAll(
     [
-      { name: ust, address: TOKEN[destChain].UST },
-      { name: luna, address: TOKEN[destChain].LUNA },
+      { name: fromToken, address: TOKEN[destChain][fromTokenKey] },
+      { name: toToken, address: TOKEN[destChain][toTokenKey] },
     ],
     UNISWAP_ROUTER[destChain],
     destChain
@@ -98,10 +103,10 @@ const lunaAmountForLP = ethers.utils.parseUnits("2", 5).toString();
   console.log(`\n==== Adding LP to the router contract... ====`);
   const receipt = await contract
     .addLiquidity(
-      TOKEN[destChain].LUNA,
-      TOKEN[destChain].UST,
-      lunaAmountForLP,
-      ustAmountForLP,
+      TOKEN[destChain][fromTokenKey],
+      TOKEN[destChain][toTokenKey],
+      fromTokenAmountForLP,
+      toTokenAmountForLP,
       0,
       0,
       evmWallet.address,
@@ -114,9 +119,9 @@ const lunaAmountForLP = ethers.utils.parseUnits("2", 5).toString();
 
   // Approve UST to the gateway contract at the source chain if needed.
   await approveAll(
-    [{ name: ust, address: TOKEN[chain].UST }],
-    GATEWAY[chain],
-    chain
+    [{ name: fromToken, address: TOKEN[srcChain][fromTokenKey] }],
+    GATEWAY[srcChain],
+    srcChain
   );
 
   // Swap 5 UST to luna
@@ -125,25 +130,29 @@ const lunaAmountForLP = ethers.utils.parseUnits("2", 5).toString();
   const payload = encoder.encode(
     ["address[]", "string", "address", "string"],
     [
-      [TOKEN[destChain].UST, TOKEN[destChain].LUNA],
-      receiveChain,
+      [TOKEN[destChain][fromTokenKey], TOKEN[destChain][toTokenKey]],
+      recipientChain,
       evmWallet.address,
-      DISTRIBUTION_EXECUTOR[receiveChain],
+      DISTRIBUTION_EXECUTOR[recipientChain],
     ]
   );
-  const gateway = AxelarGateway.create(Environment.DEVNET, chain, srcProvider);
+  const gateway = AxelarGateway.create(
+    Environment.DEVNET,
+    srcChain,
+    srcProvider
+  );
   const callContractReceipt = await gateway
     .createCallContractWithTokenTx({
       destinationChain: destChain,
       destinationContractAddress: SWAP_EXECUTOR[destChain],
       payload,
-      symbol: ust,
-      amount: ustAmountForSwap,
+      symbol: fromToken,
+      amount: fromTokenAmountForSwap,
     })
     .then((tx) => tx.send(evmWallet.connect(srcProvider)))
     .then((tx) => tx.wait());
   console.log(
     "Call contract with token tx:",
-    EXPLORER_TX[chain] + callContractReceipt.transactionHash
+    EXPLORER_TX[srcChain] + callContractReceipt.transactionHash
   );
 })();

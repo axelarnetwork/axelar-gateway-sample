@@ -16,65 +16,83 @@ import { getProvider } from "./providers";
 import { approveAll, getBalance } from "./utils/token";
 
 // Config your own here.
-const chain = EvmChain.AVALANCHE;
-const provider = getProvider(chain);
-const ustAmount = ethers.utils.parseUnits("10", 6).toString();
-const lunaAmount = ethers.utils.parseUnits("1", 5).toString();
-const ust = "UST";
-const luna = "LUNA";
+const srcChain = EvmChain.AVALANCHE;
+const destChainA = EvmChain.ETHEREUM;
+const destChainB = EvmChain.MOONBEAM;
+const transferTokenA = "UST";
+const transferTokenB = "LUNA";
+const transferAmountTokenA = ethers.utils.parseUnits("10", 6).toString();
+const transferAmountTokenB = ethers.utils.parseUnits("1", 5).toString();
 
+const provider = getProvider(srcChain);
+const keyTokenA = transferTokenA.toUpperCase();
+const keyTokenB = transferTokenB.toUpperCase();
 (async () => {
-  console.log(`==== Your balance ==== `);
-  const ustBalance = await getBalance(TOKEN[chain].UST, chain);
-  console.log(ethers.utils.formatUnits(ustBalance, 6), ust);
-  const lunaBalance = await getBalance(TOKEN[chain].LUNA, chain);
-  console.log(ethers.utils.formatUnits(lunaBalance, 6), luna);
+  console.log(`==== Your balance on ${srcChain} ==== `);
+  const balanceTokenA = await getBalance(TOKEN[srcChain][keyTokenA], srcChain);
+  console.log(ethers.utils.formatUnits(balanceTokenA, 6), transferTokenA);
+  const balanceTokenB = await getBalance(TOKEN[srcChain][keyTokenB], srcChain);
+  console.log(ethers.utils.formatUnits(balanceTokenB, 6), transferTokenB);
 
   // Approve tokens to Gateway Contract
   await approveAll(
     [
-      { address: TOKEN[chain].UST, name: ust },
-      { address: TOKEN[chain].LUNA, name: luna },
+      {
+        address: TOKEN[srcChain][keyTokenA],
+        name: transferTokenA,
+      },
+      {
+        address: TOKEN[srcChain][keyTokenB],
+        name: transferTokenB,
+      },
     ],
-    GATEWAY[chain],
-    chain
+    GATEWAY[srcChain],
+    srcChain
   );
 
-  console.log("\n==== Call contract with token ====");
+  console.log(
+    `\n==== Sending ${ethers.utils.formatUnits(
+      transferAmountTokenA,
+      6
+    )} ${transferTokenA} to ${destChainA} and ${ethers.utils.formatUnits(
+      transferAmountTokenB,
+      6
+    )} ${transferTokenB} to ${destChainB} ====`
+  );
   const encoder = ethers.utils.defaultAbiCoder;
   const payloadDistributionExecutor = encoder.encode(
     ["address[]"],
     [[evmWallet.address]]
   );
-  const payloadBatchMessageSenderEth = encoder.encode(
+  const payloadBatchMessageSenderChainA = encoder.encode(
     ["string", "string", "bytes", "string", "uint256"],
     [
-      EvmChain.ETHEREUM,
-      DISTRIBUTION_EXECUTOR[EvmChain.ETHEREUM],
+      destChainA,
+      DISTRIBUTION_EXECUTOR[destChainA],
       payloadDistributionExecutor,
-      ust,
-      ustAmount,
+      transferTokenA,
+      transferAmountTokenA,
     ]
   );
-  const payloadBatchMessageSenderMoonbeam = encoder.encode(
+  const payloadBatchMessageSenderChainB = encoder.encode(
     ["string", "string", "bytes", "string", "uint256"],
     [
-      EvmChain.MOONBEAM,
-      DISTRIBUTION_EXECUTOR[EvmChain.MOONBEAM],
+      destChainB,
+      DISTRIBUTION_EXECUTOR[destChainB],
       payloadDistributionExecutor,
-      luna,
-      lunaAmount,
+      transferTokenB,
+      transferAmountTokenB,
     ]
   );
   const contract = new ethers.Contract(
-    BATCH_MESSAGE_SENDER[chain],
+    BATCH_MESSAGE_SENDER[srcChain],
     batchMessageSenderAbi,
     evmWallet.connect(provider)
   );
   const receipt = await contract
     .batchCallContractWithToken([
-      payloadBatchMessageSenderEth,
-      payloadBatchMessageSenderMoonbeam,
+      payloadBatchMessageSenderChainA,
+      payloadBatchMessageSenderChainB,
     ])
     .then((tx) => tx.wait());
 
