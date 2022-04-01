@@ -94,7 +94,7 @@ const lunaAmountForLP = ethers.utils.parseUnits("2", 5).toString();
     uniswapRouterAbi,
     evmWallet.connect(destProvider)
   );
-  const deadline = Math.floor(new Date().getTime() / 1000) + 60 * 20;
+  const deadline = Math.floor(new Date().getTime() / 1000) + 60 * 20; // 20 mins
   console.log(`\n==== Adding LP to the router contract... ====`);
   const receipt = await contract
     .addLiquidity(

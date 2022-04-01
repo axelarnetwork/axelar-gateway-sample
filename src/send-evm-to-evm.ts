@@ -11,7 +11,7 @@ import { ethers } from "ethers";
 import { evmWallet } from "./wallet";
 import { DISTRIBUTION_EXECUTOR, GATEWAY, TOKEN } from "./constants/address";
 import { getProvider } from "./providers";
-import { approveAll, getBalance, isRequireApprove } from "./utils/token";
+import { approveAll, getBalance } from "./utils/token";
 import { EXPLORER_TX } from "./constants/endpoint";
 
 // Config your own here.
@@ -23,6 +23,7 @@ const tokenSymbol = "UST";
 const gateway = AxelarGateway.create(Environment.DEVNET, chain, provider);
 
 (async () => {
+  gateway.getContract().interface.functions;
   console.log(`==== Your ${tokenSymbol} balance ==== `);
   const tokenBalance = await getBalance(TOKEN[chain][tokenSymbol], chain);
   console.log(ethers.utils.formatUnits(tokenBalance, 6), tokenSymbol);
