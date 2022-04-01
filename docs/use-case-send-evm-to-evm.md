@@ -1,4 +1,4 @@
-# Send token from evm to another evm chain.
+## Send token from evm to another evm chain.
 
 Open `src/send-evm-to-evm.ts` file and edit the following values:
 

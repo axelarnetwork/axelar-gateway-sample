@@ -1,4 +1,4 @@
-# Send multiple tokens from evm chain to multiple evm chains.
+## Send multiple tokens from evm chain to multiple evm chains.
 
 Open `src/batch-send-evm-to-evm.ts` file and edit the following values:
 

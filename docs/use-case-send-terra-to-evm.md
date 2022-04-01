@@ -1,4 +1,4 @@
-# Send token from terra to evm chain.
+## Send token from terra to evm chain.
 
 Open `src/send-terra-to-evm.ts` file and edit the following values:
 
