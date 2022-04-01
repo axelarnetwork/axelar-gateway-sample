@@ -12,15 +12,17 @@ This repo demonstrates the usage of `AxelarGateway` of the `@axelar-network/axel
 
 ## Example use-cases
 
-### Send token from terra to evm chain.
+### 1. Send token from terra to evm chain.
 
 Open `src/send-token-terra-to-evm.ts` file and edit the following values:
 
+```
 - recipientAddress: Your recipient address at the destination chain.
 - destChain: Your destination chain. The available values are `EvmChain.ETHEREUM`, `EvmChain.MOONBEAM` and `EvmChain.AVALANCHE`.
 - transferToken: The token denom to transfer. The available values can be either `uusd` or `uluna`.
 - transferAmount: The amount to send in the smallest denomination. e.g. `10000000` for 10 ust.
+```
 
 Finally, run `npm run terra-to-evm` to execute the script.
 
-### Send token from evm to another evm chain.
+### 2. Send token from evm to another evm chain.
