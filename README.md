@@ -1,4 +1,4 @@
-# Axelar Gateway Sample
+# Axelar General Message Passing Sample
 
 This repo demonstrates the usage of `AxelarGateway` of the `@axelar-network/axelarjs-sdk` library. Also, providing some use-cases implementation.
 
