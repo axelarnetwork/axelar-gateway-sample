@@ -21,10 +21,10 @@ const transferToken = "UST";
 const transferAmount = ethers.utils.parseUnits("50", 6).toString();
 
 const provider = getProvider(srcChain);
-const gateway = AxelarGateway.create(Environment.DEVNET, srcChain, provider);
+const gateway = AxelarGateway.create(Environment.TESTNET, srcChain, provider);
 
 (async () => {
-  gateway.getContract().interface.functions;
+  console.log(gateway.getContract().address);
   console.log(`==== Your ${transferToken} balance on ${srcChain} ==== `);
   const tokenBalance = await getBalance(
     TOKEN[srcChain][transferToken],

@@ -9,6 +9,7 @@ async function deployDistributionExecutor(chain: EvmChain) {
   const executor = await Executor.deploy(gatewayAddress);
   await executor.deployed();
   console.log("Executor deployed to:", executor.address);
+  return executor.address;
 }
 
 async function deployBatchMessageSender(chain: EvmChain) {
@@ -44,12 +45,10 @@ async function verify(address: string, args: any[]) {
   });
 }
 
-const chain = EvmChain.MOONBEAM;
+const chain = EvmChain.ETHEREUM;
 
-deploySwapExecutor(chain)
-  .then((address) =>
-    verify(address, [GATEWAY[chain], UNISWAP_ROUTER[chain], chain])
-  )
+deployDistributionExecutor(chain)
+  .then((address) => verify(address, [GATEWAY[chain]]))
   .then(() => process.exit(0))
   .catch((error) => {
     console.error(error);
