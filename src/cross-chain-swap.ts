@@ -24,7 +24,7 @@ import { EXPLORER_TX } from "./constants/endpoint";
 // Config your own here.
 const srcChain = EvmChain.AVALANCHE;
 const destChain = EvmChain.MOONBEAM;
-const recipientChain = EvmChain.AVALANCHE;
+const recipientChain = EvmChain.MOONBEAM;
 const fromToken = "UST";
 const toToken = "LUNA";
 // Should not be too large compare to the liquidity size.
@@ -144,7 +144,7 @@ const toTokenKey = toToken.toUpperCase();
     ]
   );
   const gateway = AxelarGateway.create(
-    Environment.DEVNET,
+    Environment.TESTNET,
     srcChain,
     srcProvider
   );
