@@ -45,10 +45,13 @@ async function verify(address: string, args: any[]) {
   });
 }
 
-const chain = EvmChain.ETHEREUM;
+const chain = EvmChain.AVALANCHE;
 
-deployDistributionExecutor(chain)
-  .then((address) => verify(address, [GATEWAY[chain]]))
+// deployDistributionExecutor(chain)
+deploySwapExecutor(chain)
+  .then((address) =>
+    verify(address, [GATEWAY[chain], UNISWAP_ROUTER[chain], chain])
+  )
   .then(() => process.exit(0))
   .catch((error) => {
     console.error(error);
