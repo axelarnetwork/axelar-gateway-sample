@@ -45,7 +45,7 @@ async function verify(address: string, args: any[]) {
   });
 }
 
-const chain = EvmChain.AVALANCHE;
+const chain = EvmChain.MOONBEAM;
 
 // deployDistributionExecutor(chain)
 deploySwapExecutor(chain)

@@ -18,6 +18,12 @@ contract SwapExecutor is IAxelarExecutable {
         chain = _chain;
     }
 
+    event TokenSwap(
+        bytes32 indexed payloadHash,
+        string indexed symbol,
+        uint256 indexed amount
+    );
+
     function _executeWithToken(
         string memory,
         string memory,
@@ -70,6 +76,7 @@ contract SwapExecutor is IAxelarExecutable {
                 outputAmount
             );
         }
+        emit TokenSwap(keccak256(payload), tokenSymbol, amount);
     }
 
     function _approveIfNeeded(
